@@ -41,9 +41,9 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   useEffect(() => {
     if (cartPreviousValue !== cart) {
-      localStorage.setItem('@Rocketseat:cart', JSON.stringify(cart))
+      localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart))
     }
-  }, [cart, cartPreviousValue])
+  }, [cart, cartPreviousValue]);
 
   const addProduct = async (productId: number) => {
     try {
@@ -73,6 +73,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       }
 
       setCart(updateCart);
+      
     } catch {
       toast.error('Erro na adição do produto');
     }
@@ -80,19 +81,17 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const removeProduct = (productId: number) => {
     try {
-      const updateCart = [...cart];
-      const productIndex = updateCart.findIndex(product => product.id === productId);
+      const updatedCart = [...cart];
+      const productIndex = updatedCart.findIndex(product => product.id === productId);
       
       if(productIndex >= 0) {
-        updateCart.splice(productIndex, 1);
-        setCart(updateCart);
-        localStorage.setItem('@Rocketseat:cart', JSON.stringify(updateCart))
-
+        updatedCart.splice(productIndex, 1);
+        setCart(updatedCart);
       } else {
         throw Error();
       }
     } catch {
-      // TODO
+      toast.error('Erro na remoção do produto')
     }
   };
 
@@ -108,7 +107,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       const stock = await api.get(`/stock/${productId}`);
       const stockAmount = stock.data.amount;
       if (amount > stockAmount) {
-        toast.error('Erro na alteração de quantidade do produto');
+        toast.error('Quantidade solicitada fora de estoque');
         return;
       }
 
@@ -118,7 +117,6 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       if (productExist) {
         productExist.amount = amount;
         setCart(updatedCart);
-        localStorage.setItem('@Rocketseat:cart', JSON.stringify(updatedCart))
       } else {
         throw Error();
       }
